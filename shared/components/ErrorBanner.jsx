@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
-import { useError } from "../context/ErrorContext";
+import { useError } from "../contexts/ErrorContext";
+
 
 export default function ErrorBanner() {
   const { errorBanner } = useError();

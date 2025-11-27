@@ -1,11 +1,10 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import NetInfo from "@react-native-community/netinfo";
-import { triggerGlobalLogout } from "../auth/globalLogoutConfig";
 import { errorBridge } from "../lib/utils";
+import { triggerGlobalLogout } from "../../features/auth/config/globalLogoutConfig";
 
-export const isDevelopment =
-  process.env.EXPO_PUBLIC_APP_ENV === "development";
+export const isDevelopment = process.env.EXPO_PUBLIC_APP_ENV === "development";
 
 export const baseURL = isDevelopment
   ? process.env.EXPO_PUBLIC_API_DEV
@@ -19,8 +18,7 @@ export const axiosConfig = axios.create({
 const getAccessToken = () => SecureStore.getItemAsync("accessToken");
 const getRefreshToken = () => SecureStore.getItemAsync("refreshToken");
 
-const saveAccessToken = (t) =>
-  SecureStore.setItemAsync("accessToken", t || "");
+const saveAccessToken = (t) => SecureStore.setItemAsync("accessToken", t || "");
 const saveRefreshToken = (t) =>
   SecureStore.setItemAsync("refreshToken", t || "");
 
@@ -36,7 +34,7 @@ const refreshTokens = async () => {
         if (accessToken) await saveAccessToken(accessToken);
         if (refreshToken) await saveRefreshToken(refreshToken);
 
-        return accessToken;
+        return { accessToken, refreshToken };
       })
       .catch((err) => {
         triggerGlobalLogout();
@@ -91,12 +89,12 @@ axiosConfig.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // ensure only one refresh call happens
-        const newAccessToken = await refreshTokens();
+        const newTokens = await refreshTokens();
 
         // attach new token to retry request headers
-        if (newAccessToken) {
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        if (newTokens) {
+          originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+          originalRequest.headers["refresh-token"] = `Bearer ${newTokens.refreshToken}`;
         }
 
         return axiosConfig(originalRequest);

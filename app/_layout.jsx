@@ -4,3 +4,8 @@ import './globals.css';
 export default function RootLayout() {
   return <Stack />;
 }
+
+ <ErrorProvider>
+      <ErrorBanner />
+      <Slot />
+    </ErrorProvider>

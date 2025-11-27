@@ -3,8 +3,8 @@ import React from 'react'
 
 const QrScanner = () => {
   return (
-    <View>
-      <Text>QrScanner</Text>
+    <View className="flex-1 justify-center items-center">
+      <Text className="text-foreground dark:text-foreground-dark">QrScanner</Text>
     </View>
   )
 }

@@ -6,8 +6,8 @@ import { setLogoutFunction } from "../../features/auth/config/globalLogoutConfig
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-//   const navigate = useNavigate();
-//   const location = useLocation();
+  //   const navigate = useNavigate();
+  //   const location = useLocation();
 
   const [user, setUser] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -53,8 +53,8 @@ export const AuthProvider = ({ children }) => {
           } else {
             // No user found, redirect to login if not on public route
             if (!isPublicRoute(location.pathname)) {
-                setIsAuthenticated(false);
-            //   navigate(ROUTES.AUTH.LOGIN, { replace: true });
+              setIsAuthenticated(false);
+              //   navigate(ROUTES.AUTH.LOGIN, { replace: true });
             }
           }
         } catch (err) {
@@ -84,11 +84,11 @@ export const AuthProvider = ({ children }) => {
       await authService.logout();
       isAuthenticated(false);
     } catch (err) {
-        isAuthenticated(false);
+      isAuthenticated(false);
       console.error("Logout error:", err);
     } finally {
       setUser(null);
-    //   navigate(ROUTES.AUTH.LOGIN, { replace: true });
+      //   navigate(ROUTES.AUTH.LOGIN, { replace: true });
     }
   }, []);
 
@@ -110,6 +110,7 @@ export const AuthProvider = ({ children }) => {
         updateUser,
         loading,
         isAuthenticated,
+        setIsAuthenticated,
         initialLoading,
       }}
     >

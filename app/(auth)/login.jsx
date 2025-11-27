@@ -3,10 +3,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import {useAuth} from "@/shared/contexts/AuthContext"
 
 const Login = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const {setIsAuthenticated} = useAuth()
 
   return (
     <SafeAreaView className="flex-1 bg-background dark:bg-background-dark">
@@ -44,21 +46,29 @@ const Login = () => {
             <TextInput
               placeholder="Enter your email"
               placeholderTextColor="#999"
-              className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 mb-5 bg-white dark:bg-[#1a1a1a] shadow-sm"
+              className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 mb-5 bg-white dark:bg-[#1a1a1a]"
               keyboardType="email-address"
               autoCapitalize="none"
             />
 
-            {/* Password Label */}
-            <Text className="text-sm mb-1 text-foreground dark:text-foreground-dark font-medium">
-              Password
-            </Text>
+            <View className="flex items-center justify-between flex-row mb-1">
+              {/* Password Label */}
+              <Text className="text-sm text-foreground dark:text-foreground-dark font-medium">
+                Password
+              </Text>
+              {/* Forgot Password */}
+              <TouchableOpacity className="mt-3 mb-6 self-end">
+                <Text className="text-primary-light font-medium text-sm">
+                  Forgot Password?
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <View className="w-full relative">
               <TextInput
                 placeholder="Enter your password"
                 placeholderTextColor="#999"
-                className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 pr-12 bg-white dark:bg-[#1a1a1a] shadow-sm"
+                className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 pr-12 bg-white dark:bg-[#1a1a1a]"
                 secureTextEntry={!showPassword}
               />
 
@@ -75,15 +85,14 @@ const Login = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Forgot Password */}
-            <TouchableOpacity className="mt-3 mb-6 self-end">
-              <Text className="text-primary-light font-medium text-sm">
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
-
             {/* Login Button */}
-            <TouchableOpacity className="bg-primary-light rounded-full p-4 w-full active:opacity-80 shadow-md">
+            <TouchableOpacity 
+            className="bg-primary-light rounded-xl p-4 w-full active:opacity-80 shadow-md mt-6"
+            onPress={() => {
+              router.replace("/(app)/(tabs)")
+              setIsAuthenticated(true)
+            }}
+            >
               <Text className="text-white text-center font-semibold text-base">
                 Sign In
               </Text>
@@ -101,8 +110,8 @@ const Login = () => {
 
           {/* QR Login */}
           <TouchableOpacity
-            className="border border-primary-light rounded-full p-4 w-full active:opacity-80"
-            onPress={() => router.push("/qr/scanner")}
+            className="border border-primary-light rounded-xl p-4 w-full active:opacity-80"
+            onPress={() => router.push("/qr-scanner")}
           >
             <Text className="text-primary-light text-center font-semibold text-base">
               Login with QR Code

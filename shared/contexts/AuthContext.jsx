@@ -1,7 +1,7 @@
 import { setLogoutFunction } from "@/features/auth/config/globalLogoutConfig";
 import { authService } from "@/features/auth/services/authServices";
 import { clearTokens, getRefreshToken, saveTokens } from "@/shared/config/tokenConfig";
-import {appEndpoints} from "@/shared/constants/appRoutesEndpoint";
+import { appEndpoints } from "@/shared/constants/appRoutesEndpoint";
 import { useRouter, useSegments } from "expo-router";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
@@ -51,9 +51,12 @@ export const AuthProvider = ({ children }) => {
 
   // --- LOGOUT ---
   const logout = useCallback(async () => {
+    setLoading(true);
     try {
       await authService.logout();
+      setLoading(false)
     } catch (err) {
+      setLoading(false)
       console.log("Logout API error:", err);
     }
 

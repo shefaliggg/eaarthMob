@@ -8,14 +8,14 @@ export const useQrLogin = (onSuccess, onError) => {
 
   const saveQrId = useCallback((value) => {
     setQrId(value);
-    setError("")
+    setError("");
   }, []);
 
   const clearQrId = useCallback(() => {
     setQrId(null);
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async ({loginType}) => {
     if (!qrId) {
       setError("QrId are required");
       return false;
@@ -25,13 +25,23 @@ export const useQrLogin = (onSuccess, onError) => {
     setLoading(true);
 
     try {
-      const response = await authService.a({
-        qrId,
-      });
+      if (loginType === "mobile") {
+        const response = await authService.mobileQRlogin({
+          qrId,
+        });
 
-      if (response?.success) {
-        onSuccess?.(response.data);
-        return true;
+        if (response?.success) {
+          onSuccess?.(response.data);
+          return true;
+        }
+      } else {
+        const response = await authService.webQRlogin({
+          qrId,
+        });
+        if (response?.success) {
+          onSuccess?.(response.message);
+          return true;
+        }
       }
 
       clearQrId();

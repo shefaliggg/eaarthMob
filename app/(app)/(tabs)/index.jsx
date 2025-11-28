@@ -1,8 +1,12 @@
+import { appEndpoints } from "@/shared/constants/appRoutesEndpoint";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
+  const router = useRouter();
+
   const isImageAvailable = false
   return (
     <SafeAreaView className="flex-1 bg-[#F4F7FA]">
@@ -60,7 +64,10 @@ export default function Home() {
           WEB ACCESS
         </Text>
 
-        <TouchableOpacity className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex-row items-center shadow-md">
+        <TouchableOpacity
+          className="bg-white p-4 rounded-2xl border border-gray-200 mb-6 flex-row items-center shadow-md"
+          onPress={() => router.push(appEndpoints.app.qrScanner)}
+        >
           <View className="bg-blue-100 p-3 rounded-xl mr-4">
             <Ionicons name="scan" size={28} color="#2563EB" />
           </View>

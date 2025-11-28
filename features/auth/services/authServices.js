@@ -84,9 +84,21 @@ export const authService = {
     }
   },
 
-  QRlogin: async ({ qrId }) => {
+  mobileQRlogin: async ({ qrId }) => {
     try {
       const { data } = await axiosConfig.post("/auth/qr-code/mobile/approve", {
+        qrId
+      });
+
+      if (!data?.success) throw new Error(data?.message || "Qr Login failed");
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Qr Login failed.");
+    }
+  },
+  webQRlogin: async ({ qrId }) => {
+    try {
+      const { data } = await axiosConfig.post("/auth/qr-code/web/approve", {
         qrId
       });
 

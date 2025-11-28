@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -6,8 +6,10 @@ import { useRouter } from "expo-router";
 import { useQrLogin } from "../../features/auth/hooks/useQrLogin";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { Loader2 } from "lucide-react-native";
+import { appEndpoints } from "@/shared/constants/appRoutesEndpoint";
+import { toast } from "sonner-native";
 
-const QrScanner = () => {
+const MobileQrScanner = () => {
   const router = useRouter();
   const { loginSuccess } = useAuth();
 
@@ -27,17 +29,28 @@ const QrScanner = () => {
     error,
     setError,
     handleSubmit
-  } = useQrLogin((data) => {
-    loginSuccess({ user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
-  },
+  } = useQrLogin(
+    (data) => {
+      loginSuccess({
+        user: data.user,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+
+      toast.success("Login successful!");
+      router.replace(appEndpoints.app.home);
+    },
     (error) => {
-      console.error("Qr Login Failed", error)
-      setError(error?.message || "Failed to Login Using QR")
-    });
+      console.error("QR Login Failed", error);
+      setError(error?.message || "Failed to Login Using QR");
+      toast.error("QR login failed");
+    }
+  );
+
 
   const handleButtonPress = async () => {
     if (!scanned) return;
-    await handleSubmit();
+    await handleSubmit({ loginType: "mobile" });
     setScanned(false);
   };
 
@@ -110,15 +123,10 @@ const QrScanner = () => {
         <TouchableOpacity
           onPress={handleButtonPress}
           disabled={!qrId || loading}
-          className={`bg-white px-8 py-4 rounded-full flex-row items-center justify-center`}
+          className={`bg-white px-8 py-4 rounded-full flex-row gap-2 items-center justify-center`}
         >
           {loading && (
-            <Loader2
-              size={22}
-              className="mr-2"
-              color="black"
-              style={{ transform: [{ rotate: "0deg" }] }}
-            />
+            <ActivityIndicator size="small" color="#fff" />
           )}
 
           <Text className="text-black font-semibold">
@@ -135,4 +143,4 @@ const QrScanner = () => {
   );
 };
 
-export default QrScanner;
+export default MobileQrScanner;

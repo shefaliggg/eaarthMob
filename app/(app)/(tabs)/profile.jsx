@@ -1,14 +1,14 @@
 import { useAuth } from "@/shared/contexts/AuthContext"
 import { Ionicons } from '@expo/vector-icons'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import ScreenWrapper from '../../../shared/components/ScreenWrapper'
 import { triggerGlobalLogout } from "../../../features/auth/config/globalLogoutConfig"
+import ScreenWrapper from '../../../shared/components/ScreenWrapper'
 
 
 const Profile = () => {
   const isImageAvailable = false
-  const { setIsAuthenticated } = useAuth()
+  const { loading } = useAuth()
 
   return (
     <ScreenWrapper className="flex min-h-screen">
@@ -51,9 +51,12 @@ const Profile = () => {
                 triggerGlobalLogout();
               }}
             >
-              <Ionicons name="log-out-outline" size={24} color="#ffffff" />
+              {loading
+                ? <ActivityIndicator size="small" color="#fff" />
+                : <Ionicons name="log-out-outline" size={24} color="#ffffff" />
+              }
               <Text className="text-white font-semibold text-base">
-                Unlink Device
+                {loading ? "Unlinking Device" : "Unlink Device"}
               </Text>
             </TouchableOpacity>
           </View>

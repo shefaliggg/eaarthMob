@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ScreenWrapper from '../../../shared/components/ScreenWrapper'
+import { triggerGlobalLogout } from "../../../features/auth/config/globalLogoutConfig"
 
 
 const Profile = () => {
@@ -47,10 +48,10 @@ const Profile = () => {
             <TouchableOpacity
               className="bg-red-600 rounded-xl p-4 w-full flex flex-row justify-center items-center gap-2 active:opacity-80 shadow-md"
               onPress={() => {
-                setIsAuthenticated(false)
+                triggerGlobalLogout();
               }}
             >
-              <Ionicons name="log-out-outline" size={24} color="#333" />
+              <Ionicons name="log-out-outline" size={24} color="#ffffff" />
               <Text className="text-white font-semibold text-base">
                 Unlink Device
               </Text>

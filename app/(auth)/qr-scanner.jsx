@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useQrLogin } from "../../features/auth/hooks/useQrLogin";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import { Loader2 } from "lucide-react-native";
 
 const QrScanner = () => {
-  const { saveQrId } = useQrLogin();
   const router = useRouter();
+  const { loginSuccess } = useAuth();
 
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
@@ -18,15 +20,33 @@ const QrScanner = () => {
     }
   }, []);
 
+  const {
+    qrId,
+    saveQrId,
+    loading,
+    error,
+    setError,
+    handleSubmit
+  } = useQrLogin((data) => {
+    loginSuccess({ user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
+  },
+    (error) => {
+      console.error("Qr Login Failed", error)
+      setError(error?.message || "Failed to Login Using QR")
+    });
+
+  const handleButtonPress = async () => {
+    if (!scanned) return;
+    await handleSubmit();
+    setScanned(false);
+  };
+
   const handleScan = ({ data }) => {
     console.log(data)
     if (scanned) return;
 
     setScanned(true);
     saveQrId(data);
-
-    // Navigate after scanning
-    // router.push("/somewhere");
   };
 
   if (!permission)
@@ -80,22 +100,36 @@ const QrScanner = () => {
           <View className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[#b26aff] rounded-br-xl" />
         </View>
 
-        {/* Instruction */}
         <Text className="text-white/70 text-center mt-7 px-10">
           Align the QR code from the Web Login Page to link your account.
         </Text>
       </View>
 
       {/* Bottom Button */}
-      <View className="pb-10 justify-center items-center">
+      <View className={`pb-10 justify-center items-center ${!qrId && loading ? "opacity-50" : ""}`}>
         <TouchableOpacity
-          onPress={() => setScanned(false)}
-          className="bg-white px-8 py-4 rounded-full"
+          onPress={handleButtonPress}
+          disabled={!qrId || loading}
+          className={`bg-white px-8 py-4 rounded-full flex-row items-center justify-center`}
         >
+          {loading && (
+            <Loader2
+              size={22}
+              className="mr-2"
+              color="black"
+              style={{ transform: [{ rotate: "0deg" }] }}
+            />
+          )}
+
           <Text className="text-black font-semibold">
-            {scanned ? "Scan Again" : "Capture QR Code"}
+            {loading
+              ? "Verifying QR Code"
+              : scanned
+                ? "Verify QR Code"
+                : "Capture QR Code"}
           </Text>
         </TouchableOpacity>
+
       </View>
     </SafeAreaView>
   );

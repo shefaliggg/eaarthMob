@@ -5,6 +5,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Info } from "lucide-react-native";
 import { useEffect } from "react";
 import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {appEndpoints} from "@/shared/constants/appRoutesEndpoint";
 
 
 const OTPVerificationPage = () => {
@@ -21,7 +22,7 @@ const OTPVerificationPage = () => {
         console.log("params", params)
         if (!email) {
             console.error("email is not found in Otp page")
-            router.replace("(auth)/login");
+            router.replace(appEndpoints.auth.login);
         }
     }, [email]);
 

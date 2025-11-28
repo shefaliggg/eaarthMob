@@ -1,12 +1,16 @@
-import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { appEndpoints } from "@/shared/constants/appRoutesEndpoint";
 import { Ionicons } from "@expo/vector-icons";
-import ScreenWrapper from "../../shared/components/ScreenWrapper";
+import { useRouter } from "expo-router";
+import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLogin } from "../../features/auth/hooks/useLogin";
+import ScreenWrapper from "../../shared/components/ScreenWrapper";
+import { Loader2 } from "lucide-react-native";
 
 const Login = () => {
   const router = useRouter();
+
+  console.log("endpoint", appEndpoints)
 
   const {
     email,
@@ -23,7 +27,7 @@ const Login = () => {
 
     (data) => {
       router.replace({
-        pathname: "(auth)/otp-verification",
+        pathname: appEndpoints.auth.otpVerification,
         params: {
           email: data.email,
           password,
@@ -133,18 +137,23 @@ const Login = () => {
 
                 {/* Login Button */}
                 <TouchableOpacity
-                  className={`bg-primary-light rounded-xl p-4 w-full active:opacity-80 shadow-md mt-6 ${!email || !password ? "opacity-50" : ""}`}
-                  onPress={() => handleFormSubmit()}
-                  disabled={!email || !password}
-                // onPress={() => router.push("/otp-verification")}
+                  className={`bg-primary-light rounded-xl p-4 w-full active:opacity-80 shadow-md mt-6 flex-row items-center justify-center ${!email || !password ? "opacity-50" : ""}`}
+                  onPress={handleFormSubmit}
+                  disabled={!email || !password || loading}
                 >
+                  {loading && (
+                    <Loader2
+                      size={20}
+                      color="white"
+                      style={{ marginRight: 8 }}
+                    />
+                  )}
+
                   <Text className="text-white text-center font-semibold text-base">
-                    {loading
-                      ? "Signing In"
-                      : "Sign In"
-                    }
+                    {loading ? "Signing In" : "Sign In"}
                   </Text>
                 </TouchableOpacity>
+
               </View>
 
               {/* OR Separator */}
@@ -159,7 +168,7 @@ const Login = () => {
               {/* QR Login */}
               <TouchableOpacity
                 className="border border-primary-light rounded-xl p-4 w-full active:opacity-80"
-                onPress={() => router.push("/qr-scanner")}
+                onPress={() => router.push(appEndpoints.auth.qrScanner)}
               >
                 <Text className="text-primary-light text-center font-semibold text-base">
                   Login with QR Code

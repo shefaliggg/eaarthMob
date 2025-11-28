@@ -1,8 +1,9 @@
-import { useRouter, useSegments } from "expo-router";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { setLogoutFunction } from "@/features/auth/config/globalLogoutConfig";
 import { authService } from "@/features/auth/services/authServices";
 import { clearTokens, getRefreshToken, saveTokens } from "@/shared/config/tokenConfig";
+import {appEndpoints} from "@/shared/constants/appRoutesEndpoint";
+import { useRouter, useSegments } from "expo-router";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
@@ -15,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const isAuthGroup = segments[0] === "(auth)";
+  const isAuthGroup = segments[0] === "(auth)" || false;
 
   useEffect(() => {
     const init = async () => {
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
 
-    router.replace("/auth/login");
+    router.replace(appEndpoints.auth.login);
   }, []);
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
     setIsAuthenticated(true);
 
-    router.replace("/(tabs)/home");
+    router.replace(appEndpoints.app.home);
   };
 
   const updateUser = (newUserData) =>

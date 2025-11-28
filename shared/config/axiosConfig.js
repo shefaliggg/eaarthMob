@@ -1,8 +1,8 @@
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
 import NetInfo from "@react-native-community/netinfo";
-import { errorBridge } from "../lib/utils";
+import axios from "axios";
 import { triggerGlobalLogout } from "../../features/auth/config/globalLogoutConfig";
+import { errorBridge } from "../lib/utils";
+import { getAccessToken, getRefreshToken, saveTokens } from "./tokenConfig";
 
 export const isDevelopment = process.env.EXPO_PUBLIC_APP_ENV === "development";
 
@@ -15,14 +15,7 @@ export const axiosConfig = axios.create({
   timeout: 15000,
 });
 
-const getAccessToken = () => SecureStore.getItemAsync("accessToken");
-const getRefreshToken = () => SecureStore.getItemAsync("refreshToken");
-
-const saveAccessToken = (t) => SecureStore.setItemAsync("accessToken", t || "");
-const saveRefreshToken = (t) =>
-  SecureStore.setItemAsync("refreshToken", t || "");
-
-let refreshPromise = null; // shared promise
+let refreshPromise = null;
 
 const refreshTokens = async () => {
   if (!refreshPromise) {
@@ -31,8 +24,7 @@ const refreshTokens = async () => {
       .then(async (res) => {
         const { accessToken, refreshToken } = res.data;
 
-        if (accessToken) await saveAccessToken(accessToken);
-        if (refreshToken) await saveRefreshToken(refreshToken);
+        await saveTokens({ accessToken, refreshToken });
 
         return { accessToken, refreshToken };
       })
@@ -89,13 +81,15 @@ axiosConfig.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const newTokens = await refreshTokens();
+        await refreshTokens();
 
-        // attach new token to retry request headers
-        if (newTokens) {
-          originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
-          originalRequest.headers["refresh-token"] = `Bearer ${newTokens.refreshToken}`;
-        }
+        const newAccess = await getAccessToken();
+        const newRefresh = await getRefreshToken();
+
+        if (newAccess)
+          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+        if (newRefresh)
+          originalRequest.headers["refresh-token"] = `Bearer ${newRefresh}`;
 
         return axiosConfig(originalRequest);
       } catch (err) {

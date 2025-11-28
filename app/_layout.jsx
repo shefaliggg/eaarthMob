@@ -1,7 +1,6 @@
 import LoadingScreen from "@/shared/components/LoadingScreen";
 import { AuthProvider, useAuth } from "@/shared/contexts/AuthContext";
 import { Stack } from "expo-router";
-import { View } from "react-native";
 import "./globals.css";
 
 function AppRoutes() {
@@ -12,10 +11,12 @@ function AppRoutes() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
 
+      {/* Public Routes */}
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
 
+      {/* Private Routes */}
       <Stack.Protected guard={isAuthenticated}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
@@ -27,7 +28,7 @@ function AppRoutes() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-        <AppRoutes />
+      <AppRoutes />
     </AuthProvider>
   );
 }

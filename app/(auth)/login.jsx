@@ -1,126 +1,176 @@
-import { View, Text, Image, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import {useAuth} from "@/shared/contexts/AuthContext"
+import ScreenWrapper from "../../shared/components/ScreenWrapper";
+import { useLogin } from "../../features/auth/hooks/useLogin";
 
 const Login = () => {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
-  const {setIsAuthenticated} = useAuth()
+
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    setShowPassword,
+    setRememberMe,
+    loading,
+    error,
+    handleSubmit,
+  } = useLogin(
+
+    (data) => {
+      router.replace({
+        pathname: "(auth)/otp-verification",
+        params: {
+          email: data.email,
+          password,
+          rememberMe: data.rememberMe,
+          otpSend: data.otpSend,
+          otp: data.otp,
+        }
+      });
+    },
+
+    (err) => {
+      console.error("Login error:", err);
+    }
+  );
+
+  const handleFormSubmit = async () => {
+    setRememberMe(true);
+    await handleSubmit();
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-background dark:bg-background-dark">
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+    <ScreenWrapper className="flex-1 justify-center min-h-screen">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 80}
       >
-        <View className="flex-1 justify-center px-6">
+        <SafeAreaView>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="justify-center px-6">
 
-          {/* Logo & Title */}
-          <View className="items-center mb-10">
-            <Image
-              source={require("@/assets/images/eaarth.png")}
-              className="w-32 h-32 mb-4"
-              resizeMode="contain"
-            />
+              {/* Logo & Title */}
+              <View className="items-center mb-10">
+                <Image
+                  source={require("@/assets/images/eaarth.png")}
+                  className="w-42 h-20 mb-4"
+                  resizeMode="contain"
+                />
 
-            <Text className="text-[28px] font-bold text-foreground dark:text-foreground-dark text-center">
-              Welcome Back
-            </Text>
+                <Text className="text-muted-foreground-light dark:text-muted-foreground-dark text-base mt-1">
+                  Please sign in to continue with Us
+                </Text>
+              </View>
+              {error && (
+                <Text className="bg-red-100 text-red-700 p-3 rounded-lg mb-6 text-sm">
+                  {error}
+                </Text>
+              )}
 
-            <Text className="text-muted-foreground-light dark:text-muted-foreground-dark text-base mt-1">
-              Please sign in to continue
-            </Text>
-          </View>
+              {/* Form */}
+              <View className="w-full">
 
-          {/* Form */}
-          <View className="w-full">
+                {/* Email Label */}
+                <Text className="text-sm mb-1 text-foreground dark:text-foreground-dark font-medium">
+                  Email Address
+                </Text>
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="your@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor="#999"
+                  className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 mb-5 bg-white dark:bg-[#1a1a1a]"
+                />
 
-            {/* Email Label */}
-            <Text className="text-sm mb-1 text-foreground dark:text-foreground-dark font-medium">
-              Email Address
-            </Text>
-            <TextInput
-              placeholder="Enter your email"
-              placeholderTextColor="#999"
-              className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 mb-5 bg-white dark:bg-[#1a1a1a]"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
 
-            <View className="flex items-center justify-between flex-row mb-1">
-              {/* Password Label */}
-              <Text className="text-sm text-foreground dark:text-foreground-dark font-medium">
-                Password
-              </Text>
-              {/* Forgot Password */}
-              <TouchableOpacity className="mt-3 mb-6 self-end">
-                <Text className="text-primary-light font-medium text-sm">
-                  Forgot Password?
+                <View className="flex items-center justify-between flex-row mb-1">
+                  {/* Password Label */}
+                  <Text className="text-sm text-foreground dark:text-foreground-dark font-medium">
+                    Password
+                  </Text>
+                  {/* Forgot Password */}
+                  <TouchableOpacity className="mt-3 mb-6 self-end">
+                    <Text className="text-primary-light font-medium text-sm">
+                      Forgot Password?
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View className="w-full relative">
+                  <TextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Enter your password"
+                    secureTextEntry={!showPassword}
+                    placeholderTextColor="#999"
+                    className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 pr-12 bg-white dark:bg-[#1a1a1a]"
+                  />
+
+                  {/* Show / Hide Password Icon */}
+                  <TouchableOpacity
+                    className="absolute right-4 top-4"
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off" : "eye"}
+                      size={22}
+                      color="#888"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Login Button */}
+                <TouchableOpacity
+                  className={`bg-primary-light rounded-xl p-4 w-full active:opacity-80 shadow-md mt-6 ${!email || !password ? "opacity-50" : ""}`}
+                  onPress={() => handleFormSubmit()}
+                  disabled={!email || !password}
+                // onPress={() => router.push("/otp-verification")}
+                >
+                  <Text className="text-white text-center font-semibold text-base">
+                    {loading
+                      ? "Signing In"
+                      : "Sign In"
+                    }
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* OR Separator */}
+              <View className="w-full flex-row items-center justify-center my-8">
+                <View className="flex-1 h-[1px] bg-border dark:bg-border-dark" />
+                <Text className="mx-3 text-muted-foreground-light dark:text-muted-foreground-dark">
+                  OR
+                </Text>
+                <View className="flex-1 h-[1px] bg-border dark:bg-border-dark" />
+              </View>
+
+              {/* QR Login */}
+              <TouchableOpacity
+                className="border border-primary-light rounded-xl p-4 w-full active:opacity-80"
+                onPress={() => router.push("/qr-scanner")}
+              >
+                <Text className="text-primary-light text-center font-semibold text-base">
+                  Login with QR Code
                 </Text>
               </TouchableOpacity>
+
             </View>
-
-            <View className="w-full relative">
-              <TextInput
-                placeholder="Enter your password"
-                placeholderTextColor="#999"
-                className="border border-border dark:border-border-dark text-foreground dark:text-foreground-dark rounded-xl p-4 pr-12 bg-white dark:bg-[#1a1a1a]"
-                secureTextEntry={!showPassword}
-              />
-
-              {/* Show / Hide Password Icon */}
-              <TouchableOpacity
-                className="absolute right-4 top-4"
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-off" : "eye"}
-                  size={22}
-                  color="#888"
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Login Button */}
-            <TouchableOpacity 
-            className="bg-primary-light rounded-xl p-4 w-full active:opacity-80 shadow-md mt-6"
-            onPress={() => {
-              router.replace("/(app)/(tabs)")
-              setIsAuthenticated(true)
-            }}
-            >
-              <Text className="text-white text-center font-semibold text-base">
-                Sign In
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* OR Separator */}
-          <View className="w-full flex-row items-center justify-center my-8">
-            <View className="flex-1 h-[1px] bg-border dark:bg-border-dark" />
-            <Text className="mx-3 text-muted-foreground-light dark:text-muted-foreground-dark">
-              OR
-            </Text>
-            <View className="flex-1 h-[1px] bg-border dark:bg-border-dark" />
-          </View>
-
-          {/* QR Login */}
-          <TouchableOpacity
-            className="border border-primary-light rounded-xl p-4 w-full active:opacity-80"
-            onPress={() => router.push("/qr-scanner")}
-          >
-            <Text className="text-primary-light text-center font-semibold text-base">
-              Login with QR Code
-            </Text>
-          </TouchableOpacity>
-
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+    </ScreenWrapper>
   );
 };
 

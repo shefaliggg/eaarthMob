@@ -14,9 +14,11 @@
         "image": "./assets/images/eaarth.png",
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "bundleIdentifier": "com.anonymous.eaarthstudios"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/eaarth.png"
@@ -27,7 +29,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.eaarthstudios"
     },
     "web": {
       "output": "static",
@@ -35,6 +42,14 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -47,7 +62,8 @@
           "image": "./assets/images/eaarth.png"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-barcode-scanner"
     ]
   }
 }
